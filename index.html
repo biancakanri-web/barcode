@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>バーコードスキャン</title>
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
+</head>
+<body>
+  <h1>バーコードスキャン</h1>
+  <video id="video" width="400" height="300" style="border:1px solid black"></video>
+  <script>
+    const codeReader = new ZXing.BrowserBarcodeReader();
+    const videoElement = document.getElementById('video');
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxCznM281Sp1Zv3ceBwyiNYrOxhrPgikJVAn0Fh9oxyTveDeyXtzy2kyEEyWJBHGM9xiQ/exec"; // ← あなたのURLに置き換えてください
+
+    let scanning = true;
+
+    codeReader.decodeFromVideoDevice(null, videoElement, (result, err) => {
+      if (!scanning || !result) return;
+
+      const barcode = result.text;
+      scanning = false; // 一時停止
+
+      console.log("バーコード: " + barcode);
+      new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
+
+      fetch(GAS_URL + "?barcode=" + encodeURIComponent(barcode))
+        .then(() => console.log("送信成功"))
+        .catch(e => console.error(e));
+
+      // 1秒後に再スキャン可能にする
+      setTimeout(() => {
+        scanning = true;
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
