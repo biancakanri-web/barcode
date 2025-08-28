@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>バーコードスキャン</title>
-  <script src="https://unpkg.com/@zxing/library@latest"></script>
-</head>
 <body>
   <h1>バーコードスキャン</h1>
-  <video id="video" style="width:100%; max-width:400px; border:1px solid black;"></video>
+  <video id="video" width="400" height="300" style="border:1px solid black"></video>
+  <div id="result" style="margin-top:10px; font-size:1.5em; color:green;"></div>
+
   <script>
     const codeReader = new ZXing.BrowserBarcodeReader();
     const videoElement = document.getElementById('video');
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxCznM281Sp1Zv3ceBwyiNYrOxhrPgikJVAn0Fh9oxyTveDeyXtzy2kyEEyWJBHGM9xiQ/exec"; // ← あなたのURLに置き換えてください
+    const resultDisplay = document.getElementById('result');
+    const GAS_URL = "https://script.google.com/macros/s/XXXXX/exec";
 
     let scanning = true;
 
@@ -19,20 +15,29 @@
       if (!scanning || !result) return;
 
       const barcode = result.text;
-      scanning = false; // 一時停止
+      scanning = false;
 
-      console.log("バーコード: " + barcode);
+      // 🔊 音を鳴らす
       new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play();
 
+      // 📸 映像を一瞬暗くする
+      videoElement.style.opacity = "0.3";
+      setTimeout(() => {
+        videoElement.style.opacity = "1";
+      }, 300);
+
+      // 📋 読み取ったバーコードを画面に表示
+      resultDisplay.textContent = "読み取り: " + barcode;
+
+      // 📡 GASに送信
       fetch(GAS_URL + "?barcode=" + encodeURIComponent(barcode))
         .then(() => console.log("送信成功"))
         .catch(e => console.error(e));
 
-      // 1秒後に再スキャン可能にする
+      // ⏱ 1秒後に再スキャン可能にする
       setTimeout(() => {
         scanning = true;
       }, 1000);
     });
   </script>
 </body>
-</html>
