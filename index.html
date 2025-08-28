@@ -7,7 +7,7 @@
 </head>
 <body>
   <h1>バーコードスキャン</h1>
-  <video id="video" width="400" height="300" style="border:1px solid black"></video>
+  <video id="video" style="width:100%; max-width:400px; border:1px solid black;"></video>
   <script>
     const codeReader = new ZXing.BrowserBarcodeReader();
     const videoElement = document.getElementById('video');
